@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image and Video Optimizer</title>
+    <!-- Link to Tailwind CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 py-10">
+    <div class="max-w-4xl mx-auto px-4">
+        <h1 class="text-3xl font-bold mb-6 text-center">Image and Video Optimizer</h1>
+        
+        <!-- Upload Form -->
+        <form action="/upload" method="post" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="files" class="block text-sm font-medium text-gray-700">Upload Files (PNG, JPG, JPEG, GIF, MP4)</label>
+                <input type="file" name="files" id="files" multiple accept="image/*,video/*" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <small class="text-gray-500">Select up to 6 files, images or videos only.</small>
+            </div>
+            <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">Upload Files</button>
+        </form>
+
+        <!-- Download Links -->
+        <div class="mt-6">
+            {% if download_links %}
+                <h2 class="text-xl font-semibold mb-4">Processed Files</h2>
+                <ul class="space-y-2">
+                    {% for link in download_links %}
+                        <li>
+                            <a href="{{ link }}" class="text-blue-500 hover:underline">{{ link }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <!-- Error Handling -->
+        {% if error %}
+            <div class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">{{ error }}</span>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
