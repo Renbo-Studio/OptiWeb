@@ -4,17 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image and Video Optimizer</title>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'><link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     <link rel="stylesheet" href="styles.css">
 </head>
 <style>
-    body{
+
+*{
+    transition: all .5s ease-in-out;
+}
+
+body{
     background-color: black;
     color: white;
-    background: url('./img/m.jpg');
+    background: url('https://i.ibb.co/xfSxX3R/m.jpg');
     background-size: 100% 120%;
     background-repeat: no-repeat;
     background-position: bottom;
     margin: 0;
+    font-family: 'Poppins';
 }
 
 section{
@@ -27,51 +34,200 @@ section{
 }
 
 .main{
-    background: rgba(119, 118, 118, 0.192);
+    background: rgb(34, 34, 34);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 0, 0, 0.11);
     padding: 30px;
     border-radius: 16px;
-    max-width: 500px;
+    max-width: 450px;
+    width: 100%;
     position: relative;
 }
 
-.main::after{
-    position: absolute;
-    content: 'X';
-    right: 10;
-    top: 10;
-    color: red;
+button {
+  font-size: 1.2em;
+  padding: .8em 1em;
+  border-radius: 0.5em;
+  border: none;
+  background-color: #3d3d3d;
+  color: #fff;
+  cursor: pointer;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.maing {
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  border-radius: 16px;
+}
+
+.maing::before {
+  border-radius: 16px;
+  content: '';
+  position: absolute;
+  top: 4px; 
+  left: -4px;
+  right: -4px; 
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.11);
+  bottom: -4px;
+  background: linear-gradient(90deg, #03a9f4, #f441a5, #03a9f4);
+  background-size: 200% 200%;
+  z-index: -1;
+  opacity: 0;
+  width: 114%;
+  transition: opacity 0.3s ease;
+}
+
+.maing:has(.container > button:hover)::before {
+  opacity: 1;
+  animation: gradient-animation 3s ease infinite;
+}
+
+.container {
+  position: relative;
+  padding: 1px;
+  background: linear-gradient(90deg, #03a9f4, #f441a5);
+  border-radius: 0.6em;
+  transition: all 0.4s ease;
+  margin-top: 10px;
+}
+
+.container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  border-radius: 0.9em;
+  z-index: -10;
+  filter: blur(0);
+  transition: filter 0.4s ease;
+}
+
+.container:hover::before {
+  background: linear-gradient(90deg, #03a9f4, #f441a5);
+  filter: blur(.2em);
+  animation: gradient-animation 1s linear infinite;
+}
+.container:active::before {
+  filter: blur(0.2em);
+}
+
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.custum-file-upload {
+  height: 200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: space-between;
+  gap: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed #e8e8e8;
+  background-color: #00000015;
+  padding: 20px 0;
+  border-radius: 10px;
+}
+
+.custum-file-upload:hover{
+    background-color: #3d3d3d27;
+    border: 2px dashed #5fccff;
+}
+
+.custum-file-upload .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .icon svg {
+  height: 80px;
+  fill: #e8e8e8;
+}
+
+.custum-file-upload .text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custum-file-upload .text span {
+  font-weight: 400;
+  color: #e8e8e8;
+}
+
+.custum-file-upload input {
+  display: none;
 }
 </style>
 <body>
     <section>
+        <div class="maing">
         <div class="main">
             <h1>Image and Video Optimizer</h1>
             
             <!-- Upload Form -->
             <form action="/upload" method="post" enctype="multipart/form-data" >
-                <div>
-                    <label for="files">Upload Files (PNG, JPG, JPEG, GIF, MP4)</label>
-                    <input type="file" name="files" id="files" multiple accept="image/*,video/*">
+                <div id="dropArea">
+                    <label for="files" class="custum-file-upload">
+                        <div class="icon">
+                        <svg viewBox="0 0 24 24" fill="" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" fill=""></path> </g></svg>
+                        </div>
+                        <div class="text">
+                           <span>Click to upload image</span>
+                           </div>
+                           <input type="file" name="files" id="files" multiple accept="image/*,video/*">       
+                        </label><br>
                     <small>Select up to 6 files, images or videos only.</small>
+                </div><br>
+                <div id="selectedFiles"></div>
+                    <div id="loadingBar">
+                        <div id="loadingProgress"></div>
+                    </div>
+                <div class="container">
+                    <button type="submit" style="width: 100%;" class="button">Upload</button>
                 </div>
-                <button type="submit">Upload Files</button>
+                  
             </form>
     
             <!-- Download Links -->
             <div>
                 {% if download_links %}
-                    <h2>Processed Files</h2>
-                    <ul>
-                        {% for link in download_links %}
-                            <li>
-                                <a href="{{ link }}" >{{ link }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <h3>Processed Files <small style="color: #afafaf;font-weight: 400;margin-left: 2px;">click to download</small> </h3>
+                    {% for link in download_links %}
+                        <a href="{{ link }}" >
+                            <img src="{{ link }}" width="76px" height="76px" style="object-fit: cover;border-radius: 8px;margin: 5px;" />
+                        </a>
+                    {% endfor %}
                 {% endif %}
             </div>
     
@@ -83,6 +239,121 @@ section{
                 </div>
             {% endif %}
         </div>
+    </div>
     </section>
+
+    <script>
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('files');
+        const uploadForm = document.getElementById('uploadForm');
+        const selectedFilesContainer = document.getElementById('selectedFiles');
+        const loadingBar = document.getElementById('loadingBar');
+        const loadingProgress = document.getElementById('loadingProgress');
+
+        // ... (keep your existing event listeners for drag and drop) ...
+
+        function handleFiles(files) {
+            files = [...files].slice(0, 6); // Limit to 6 files
+            fileInput.files = new FileListItems(files);
+            displaySelectedFiles(files);
+        }
+
+        function displaySelectedFiles(files) {
+            selectedFilesContainer.innerHTML = '';
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.style.width = '50px';
+                    img.style.height = '50px';
+                    img.style.margin = '5px';
+                    img.style.borderRadius = '8px';
+                    img.style.objectFit = 'cover';
+                    selectedFilesContainer.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.style.width = '100px';
+                    video.style.height = '100px';
+                    video.style.objectFit = 'cover';
+                    selectedFilesContainer.appendChild(video);
+                }
+            });
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        uploadForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(uploadForm);
+            
+            loadingBar.style.display = 'block';
+            loadingProgress.style.width = '0%';
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                const reader = response.body.getReader();
+                const contentLength = +response.headers.get('Content-Length');
+                let receivedLength = 0;
+
+                return new ReadableStream({
+                    start(controller) {
+                        function push() {
+                            reader.read().then(({done, value}) => {
+                                if (done) {
+                                    controller.close();
+                                    return;
+                                }
+                                receivedLength += value.length;
+                                const percentage = (receivedLength / contentLength * 100).toFixed(2);
+                                loadingProgress.style.width = percentage + '%';
+                                controller.enqueue(value);
+                                push();
+                            });
+                        }
+                        push();
+                    }
+                });
+            })
+            .then(stream => new Response(stream))
+            .then(response => response.json())
+            .then(data => {
+                loadingBar.style.display = 'none';
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const processedFiles = document.getElementById('processedFiles');
+                    processedFiles.innerHTML = '<h2>Processed Files</h2><ul></ul>';
+                    const ul = processedFiles.querySelector('ul');
+                    data.links.forEach(link => {
+                        const li = document.createElement('li');
+                        const img = document.createElement('img');
+                        img.src = link;
+                        img.width = 80;
+                        img.height = 80;
+                        img.style.objectFit = 'cover';
+                        const a = document.createElement('a');
+                        a.href = link;
+                        a.innerText = 'Download';
+                        li.appendChild(img);
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        function FileListItems (files) {
+            const b = new ClipboardEvent('').clipboardData || new DataTransfer()
+            for (let i = 0, len = files.length; i<len; i++) b.items.add(files[i])
+            return b.files
+        }
+    </script>
 </body>
 </html>
