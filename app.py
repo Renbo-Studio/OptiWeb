@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_from_
 from werkzeug.utils import secure_filename
 import os
 from PIL import Image
+import io
 
 app = Flask(__name__)
 
@@ -17,11 +18,36 @@ def allowed_file(filename):
 def index():
     return render_template('index.html')
 
+def optimize_image(img, max_size=(1920, 1080), quality=85):
+    """Optimize the image while preserving quality."""
+    original_size = img.size[0] * img.size[1] * len(img.getbands())
+    
+    img.thumbnail(max_size, Image.LANCZOS)
+    
+    # Convert RGBA to RGB
+    if img.mode == 'RGBA':
+        background = Image.new('RGB', img.size, (255, 255, 255))
+        background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
+        img = background
+    elif img.mode == 'CMYK':
+        img = img.convert('RGB')
+    
+    buffer = io.BytesIO()
+    img.save(buffer, format='JPEG', quality=quality, optimize=True)
+    
+    optimized_size = buffer.tell()
+    
+    if optimized_size >= original_size:
+        return img, 0  # No reduction
+    
+    buffer.seek(0)
+    return Image.open(buffer), (1 - optimized_size / original_size) * 100
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     download_links = []
+    size_reductions = []
     if request.method == 'POST':
-        # Get all files from the request
         files = request.files.getlist('files')
         uploaded_count = 0
         for file in files:
@@ -31,19 +57,32 @@ def upload_file():
                     break  # Limit to 6 files
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 file.save(file_path)
-                # Process file (resize, compress, etc.)
-                if filename.endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                    original_size = os.path.getsize(file_path)
                     img = Image.open(file_path)
-                    img.thumbnail((800, 800))
-                    optimized_filename = 'optimized_' + filename
+                    optimized_img, reduction_percentage = optimize_image(img)
+                    
+                    # Determine the output format based on the original format
+                    output_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else img.format
+                    optimized_filename = f'optimized_{os.path.splitext(filename)[0]}.{output_format.lower()}'
                     optimized_file_path = os.path.join(app.config['UPLOAD_FOLDER'], optimized_filename)
-                    img.save(optimized_file_path)
+                    
+                    optimized_img.save(optimized_file_path, format=output_format, quality=85, optimize=True)
+                    
+                    optimized_size = os.path.getsize(optimized_file_path)
+                    actual_reduction = (1 - optimized_size / original_size) * 100
+                    
                     download_links.append(url_for('download_file', filename=optimized_filename))
-                elif filename.endswith('.mp4'):
-                    # Process video using moviepy or ffmpeg
+                    size_reductions.append(f"{actual_reduction:.2f}%")
+                elif filename.lower().endswith('.mp4'):
+                    # Process video using moviepy or ffmpeg (not implemented in this example)
                     download_links.append(url_for('download_file', filename=filename))
+                    size_reductions.append("N/A")
+                
                 uploaded_count += 1
-        return render_template('index.html', download_links=download_links)
+        
+        return render_template('index.html', download_links=download_links, size_reductions=size_reductions, zip=zip)
     return render_template('index.html', error='Invalid file format')
 
 @app.route('/download/<filename>')
