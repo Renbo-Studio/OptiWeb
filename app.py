@@ -19,29 +19,33 @@ def index():
     return render_template('index.html')
 
 def optimize_image(img, max_size=(1920, 1080), quality=85):
-    """Optimize the image while preserving quality."""
+    """Optimize the image while preserving quality and transparency."""
     original_size = img.size[0] * img.size[1] * len(img.getbands())
     
     img.thumbnail(max_size, Image.LANCZOS)
     
-    # Convert RGBA to RGB
-    if img.mode == 'RGBA':
-        background = Image.new('RGB', img.size, (255, 255, 255))
-        background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
-        img = background
-    elif img.mode == 'CMYK':
-        img = img.convert('RGB')
+    # Determine the output format
+    output_format = 'PNG' if img.mode == 'RGBA' else 'JPEG'
     
     buffer = io.BytesIO()
-    img.save(buffer, format='JPEG', quality=quality, optimize=True)
+    if output_format == 'PNG':
+        img.save(buffer, format='PNG', optimize=True)
+    else:
+        if img.mode == 'RGBA':
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            background.paste(img, mask=img.split()[3])  # 3 is the alpha channel
+            img = background
+        elif img.mode == 'CMYK':
+            img = img.convert('RGB')
+        img.save(buffer, format='JPEG', quality=quality, optimize=True)
     
     optimized_size = buffer.tell()
     
     if optimized_size >= original_size:
-        return img, 0  # No reduction
+        return img, 0, output_format  # No reduction
     
     buffer.seek(0)
-    return Image.open(buffer), (1 - optimized_size / original_size) * 100
+    return Image.open(buffer), (1 - optimized_size / original_size) * 100, output_format
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -61,10 +65,8 @@ def upload_file():
                 if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
                     original_size = os.path.getsize(file_path)
                     img = Image.open(file_path)
-                    optimized_img, reduction_percentage = optimize_image(img)
+                    optimized_img, reduction_percentage, output_format = optimize_image(img)
                     
-                    # Determine the output format based on the original format
-                    output_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else img.format
                     optimized_filename = f'optimized_{os.path.splitext(filename)[0]}.{output_format.lower()}'
                     optimized_file_path = os.path.join(app.config['UPLOAD_FOLDER'], optimized_filename)
                     
